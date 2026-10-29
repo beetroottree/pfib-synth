@@ -96,7 +96,7 @@ Reproduce with `experiments/score_millnet.py` (needs the team repo at `eponge-v2
 
 ## Training on it
 
-`pfibsynth/shine_data.py` builds training volumes with randomised style, porosity and ±25% jittered settings. `pfibsynth/train_shine.py` trains the team's U-Net on them (`--config zwin_random_v7` for 9-slice input, `2d_random_v7` for 1 slice). It needs `torch` and the team repo (`PFIB_TEAM_REPO`). The two checkpoints used above are in `pfibsynth/checkpoints/`.
+`pfibsynth/shine_data.py` builds training volumes with randomised style, porosity and ±25% jittered settings. `pfibsynth/train_shine.py` trains the team's U-Net on them (`--config zwin_random_v7` for 9-slice input, `2d_random_v7` for 1 slice). It needs `torch`; the team U-Net it trains is vendored as `pfibsynth/team_unet.py`. The two checkpoints used above are in `pfibsynth/checkpoints/`.
 
 ## Layout
 
@@ -122,7 +122,6 @@ docs/media/              everything shown above
 | `PFIB_OUT` | where packages are written and read back (default `out/`) | evaluation |
 | `PFIB_REAL_DIR` | `comp_full.tif`, `uncomp_full.tif`, `pristine_full.tif` | realism scoring, recalibration |
 | `PFIB_LABELS_DIR` | the team's labelled review packages | realism scoring, recalibration |
-| `PFIB_TEAM_REPO` | team repo checkout (its U-Net) | training |
 
 ## Where this sits in the team's work
 

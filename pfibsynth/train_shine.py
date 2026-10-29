@@ -28,7 +28,8 @@ import torch.nn.functional as F
 
 HERE = Path(__file__).resolve().parent
 from paths import TEAM_REPO
-UNET = TEAM_REPO / "model" / "unet.py"
+# the team U-Net: a vendored copy here, else the team repo's own
+UNET = next(p for p in (Path(__file__).resolve().parent / "team_unet.py", TEAM_REPO / "model" / "unet.py") if p.exists())
 CONFIGS = {
     "2d_random":       {"data": "train_random", "window": False, "aux": False},
     "zwin_random":     {"data": "train_random", "window": True,  "aux": False},
