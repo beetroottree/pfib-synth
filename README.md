@@ -115,7 +115,7 @@ pfibsynth/
   scorecard.py, temporal_scorecard.py    realism discriminators (need real data)
   shine_data.py, train_shine.py, shine_depth_eval.py  training and evaluation
 experiments/             MillNet-SA2 on exact truth: driver, results, plot
-tools/                   README media, truth GIFs, coming-forward coherence
+tools/                   README media; truth GIFs and coming-forward coherence next to a real stack
 docs/media/              everything shown above
 ```
 
