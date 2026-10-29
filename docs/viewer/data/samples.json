@@ -1,0 +1,58 @@
+[
+ {
+  "file": "comp_like.pfibv",
+  "label": "comp-like (catalyst foam, comp optics)"
+ },
+ {
+  "file": "uncomp_like.pfibv",
+  "label": "uncomp-like"
+ },
+ {
+  "file": "pristine_like.pfibv",
+  "label": "pristine-like"
+ },
+ {
+  "file": "mudcrack.pfibv",
+  "label": "mudcrack (held out)"
+ },
+ {
+  "file": "fibre_mat.pfibv",
+  "label": "fibre mat (held out)"
+ },
+ {
+  "file": "fibre_coated.pfibv",
+  "label": "coated fibre (held out)"
+ },
+ {
+  "file": "faceted.pfibv",
+  "label": "faceted grains (held out)"
+ },
+ {
+  "file": "x_spinodal.pfibv",
+  "label": "spinodal (extra family)"
+ },
+ {
+  "file": "x_spheres.pfibv",
+  "label": "clustered spheres (extra)"
+ },
+ {
+  "file": "x_agglomerate.pfibv",
+  "label": "agglomerate (extra)"
+ },
+ {
+  "file": "x_catalyst.pfibv",
+  "label": "three-scale catalyst (extra)"
+ },
+ {
+  "file": "x_fiber_felt.pfibv",
+  "label": "fibre felt (extra)"
+ },
+ {
+  "file": "x_sheet_felt.pfibv",
+  "label": "sheet felt (extra)"
+ },
+ {
+  "file": "x_compressed.pfibv",
+  "label": "compressed (extra)"
+ }
+]
