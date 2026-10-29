@@ -46,7 +46,7 @@ def main():
         return
     p = PRESETS[a.material]
     cmd = [sys.executable, str(HERE / "pfibsynth" / "make_full.py"), "--style", p["style"], "--family", p["family"],
-           "--porosity", str(a.porosity or p["porosity"]), "--seed", str(a.seed or p["seed"]),
+           "--porosity", str(p["porosity"] if a.porosity is None else a.porosity), "--seed", str(p["seed"] if a.seed is None else a.seed),
            "--frames", str(a.frames), "--name", f"synth_{a.material}", "--out", a.out or str(HERE / "out" / a.material)]
     if a.width:
         cmd += ["--width", str(a.width)]

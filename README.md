@@ -15,7 +15,7 @@ python generate.py comp_like --frames 40 --width 512     # ~1 min, writes out/co
 python generate.py fibre_mat                              # full 118-frame package, ~6 min
 ```
 
-Each package matches the team's review packages: an image stack `synth_<material>_full.tif` and truth masks `truth/masks/slice_NNNN.png` (0 = pore, 255 = solid, 128 = outside the layer, the encoding `eponge.io.export_to_classes` reads). `start_masks/` holds what the threshold rule behind our labels would have drawn, and `truth.json` holds every setting and the true porosity. No real data is needed to generate: the one real-derived input, the layer's grey-level histogram, ships as `pfibsynth/real_tone.json`. A stack generated from this repo is byte-identical to one from the original working copy (tested on a 10 × 630 × 320 comp stack with the real stacks hidden).
+Each package matches the team's review packages: an image stack `synth_<material>_full.tif` and truth masks `truth/masks/slice_NNNN.png` (0 = pore, 255 = solid, 128 = outside the layer, the encoding `eponge.io.export_to_classes` reads). `start_masks/` holds what the threshold rule behind our labels would have drawn, and `truth.json` holds every setting and the true porosity. No real data is needed to generate. The calibrated constants (`optics_v5.json`, `geometry.json`, `slicing.json`, ...) were measured on the real stacks once. The one thing the generator used to read from them at run time, the layer's grey-level histogram, now ships as `pfibsynth/real_tone.json`. A stack generated from this repo is byte-identical to one from the original working copy (tested on a 10 × 630 × 320 comp stack with the real stacks hidden).
 
 ## Materials
 
@@ -81,14 +81,16 @@ MillNet-SA2 is the team's best model: 0.935 mIoU against hand labels on the real
 
 ![recall by depth and porosity error per material](docs/media/millnet_on_truth.png)
 
-**MillNet reproduces its labels, shine-through misses included.** On every material it agrees with the threshold rule (pore IoU 0.69–0.84) far more than with the truth (0.28–0.75), and it misses the shallowest pores at the rule's rate (0.29 vs 0.26 recall at one slice down). The three seeds agree within 1 pp of porosity, so this is systematic, not noise. Its porosity errors follow the rule's sign on fibres and faceted grains and run larger than the rule's. This is the expected failure of training on labels: 0.935 mIoU means agreeing with the labels, and where the labels miss shine-through, so does the model.
+**On real frames MillNet is the rule; on exact truth the rule misses most shallow pores.** On the real test frames (101–117), MillNet's pores agree with the threshold rule's at pore IoU 0.91–0.96 inside the layer (3 seeds, `experiments/real_control.py`). A model that close to the rule inherits the rule's misses. On synthetic stacks, where the truth is known, the same rule misses 74% of pores whose floor is one slice down and 60% at two to three slices. The rule's miss rate on real frames cannot be measured, but nothing suggests real shine-through is easier, so 0.935 mIoU most likely measures agreement with labels that are blind to shallow shine-through.
+
+On the synthetic stacks themselves, MillNet behaves like the rule: it misses the shallowest pores at the rule's rate (0.29 vs 0.26 recall), and its porosity errors follow the rule's on fibres (−12.7 pp) and faceted grains (+35 pp). The three seeds agree within 1 pp, so this is systematic. But its agreement with the rule falls from 0.91–0.96 on real frames to 0.69–0.84 on synthetic, and it calls more solid as pore than the rule does (0.77 vs 0.83 solid correct). So part of what it does on synthetic is domain shift, and these synthetic numbers are not an estimate of its error on real data.
 
 Two caveats limit how far this goes:
 
 * **Matched renderer.** The synthetic U-Nets were trained on this renderer and MillNet was not, so part of their lead is a matched-renderer advantage. The same effect showed up as 2.9 vs 15.6 pp in the earlier cross-renderer test.
-* **Synthetic is still distinguishable from real** (table above), so part of MillNet's drop may be domain shift and not label inheritance.
+* **Synthetic is still distinguishable from real** (table above). This is the same domain shift.
 
-The agreement-with-the-rule numbers are the cleaner evidence. Domain shift would make MillNet disagree with both the rule and the truth; instead it tracks the rule. The rule's layer IoU is 1.0 only because start masks take the layer outline from the truth.
+The rule's layer IoU is 1.0 only because start masks take the layer outline from the truth.
 
 On the real stacks, the 9-slice synthetic model gives porosity 0.382 / 0.479 / 0.511 against labels of 0.397 / 0.512 / 0.501. So the shine-through correction does not simply raise real porosity, and real porosity remains unsettled.
 
