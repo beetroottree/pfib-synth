@@ -99,4 +99,4 @@ if __name__ == "__main__":
     s = vorofoam((40, 250, 500), 0.42, np.random.default_rng(1))
     print("built", round(time.time() - t, 1), "s porosity", round(1 - s.mean(), 3))
     Image.fromarray((s[10] * 255).astype(np.uint8)).save(
-        "/private/tmp/claude-501/-Users-houkinwan-Desktop-Workspace-CMU-capstone/01ca0e40-1416-4190-aea7-1125ccc06838/scratchpad/look/voro_mask.png")
+        "voro_mask.png")

@@ -679,13 +679,15 @@ def main():
     ap.add_argument("--round", type=float, default=None, help="facet rounding, px")
     ap.add_argument("--width", type=int, default=None, help="narrower frame, for quick tests")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--override", default=None, help="JSON dict of render settings to override (keys of slicing.json v7 / optics_v5.json v5)")
     a = ap.parse_args()
     n = a.frames or REAL_SLICES[a.style]
     por = a.porosity or {"comp": 0.417, "uncomp": 0.558, "pristine": 0.515}[a.style]
     name = a.name or f"synth_full_{a.style}"
     dest = Path(a.out) if a.out else paths.OUT / f"full_{name}"
     res = build(a.style, n, a.seed, a.family, por, json.loads(a.mat_kw) if a.mat_kw else None,
-                zlen=a.zlen, width=a.width, round_px=a.round, v6=a.v6)
+                zlen=a.zlen, width=a.width, round_px=a.round, v6=a.v6,
+                overrides=json.loads(a.override) if a.override else None)
 
     class A: pass
     args = A(); args.frames = n; args.name = name; args.force = True; args.style = a.style

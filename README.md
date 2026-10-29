@@ -2,36 +2,105 @@
 
 **Synthetic pFIB-SEM stacks of porous catalyst layers, with exact ground truth for every pixel.**
 
-![seven synthetic materials, paged through slice by slice](docs/media/all_materials.gif)
+**[Open the 3-D viewer in your browser](https://beetroottree.github.io/pfib-synth/viewer/)** · [showcase gallery](https://beetroottree.github.io/pfib-synth/) · [make your own](#make-your-own)
+
+![seven materials in 3-D, from the exact truth](docs/media/rotate_grid.gif)
 
 In a pFIB-SEM stack, the beam images the cut face at 52°, so a pore does not look black: you see its lit floor or far wall a few slices down. This is *shine-through*. A pore whose floor is one slice down looks almost like solid. Hand labels and threshold rules call it solid, and every model trained on those labels learns to do the same. On real data nobody can measure how often this happens, because nobody knows the answer.
 
 This generator builds a 3-D material, mills it slice by slice the way the microscope does, and renders each cut face with the beam geometry, the depth response and the detector measured on the team's three real acquisitions (comp, uncomp, pristine). The truth is known exactly, so the shine-through error can be measured instead of argued about.
 
+## Showcase
+
+Each material has five GIFs:
+
+* **milling**: the ion beam takes one slice at a time. The front of the block is the frame the electron beam images.
+* **rotate**: the solid phase in 3-D, built from the exact truth with the frame drift removed.
+* **slices**: the stack with its truth, slice by slice.
+* **reslice**: an x–z cut sweeping through the block.
+* **shine**: where the threshold rule behind our labels misses pores, coloured by how far down the lit floor is.
+
+The first three are calibrated to the real stacks. The last four are held out of training.
+
+| | milling | in 3-D | more |
+|---|---|---|---|
+| **comp-like**<br>catalyst foam, sparse large voids | ![](docs/showcase/comp_like_milling.gif) | ![](docs/showcase/comp_like_rotate.gif) | [slices](docs/showcase/comp_like_slices.gif) · [reslice](docs/showcase/comp_like_reslice.gif) · [shine](docs/showcase/comp_like_shine.gif) |
+| **uncomp-like**<br>coarser open foam | ![](docs/showcase/uncomp_like_milling.gif) | ![](docs/showcase/uncomp_like_rotate.gif) | [slices](docs/showcase/uncomp_like_slices.gif) · [reslice](docs/showcase/uncomp_like_reslice.gif) · [shine](docs/showcase/uncomp_like_shine.gif) |
+| **pristine-like**<br>finer foam, pristine's detector | ![](docs/showcase/pristine_like_milling.gif) | ![](docs/showcase/pristine_like_rotate.gif) | [slices](docs/showcase/pristine_like_slices.gif) · [reslice](docs/showcase/pristine_like_reslice.gif) · [shine](docs/showcase/pristine_like_shine.gif) |
+| **mudcrack** (held out)<br>3-D drying-crack network | ![](docs/showcase/mudcrack_milling.gif) | ![](docs/showcase/mudcrack_rotate.gif) | [slices](docs/showcase/mudcrack_slices.gif) · [reslice](docs/showcase/mudcrack_reslice.gif) · [shine](docs/showcase/mudcrack_shine.gif) |
+| **fibre mat** (held out)<br>stacked fibres, bright rims | ![](docs/showcase/fibre_mat_milling.gif) | ![](docs/showcase/fibre_mat_rotate.gif) | [slices](docs/showcase/fibre_mat_slices.gif) · [reslice](docs/showcase/fibre_mat_reslice.gif) · [shine](docs/showcase/fibre_mat_shine.gif) |
+| **coated fibre** (held out)<br>fibres with particles and binder | ![](docs/showcase/fibre_coated_milling.gif) | ![](docs/showcase/fibre_coated_rotate.gif) | [slices](docs/showcase/fibre_coated_slices.gif) · [reslice](docs/showcase/fibre_coated_reslice.gif) · [shine](docs/showcase/fibre_coated_shine.gif) |
+| **faceted** (held out)<br>sintered grains, pores at junctions | ![](docs/showcase/faceted_milling.gif) | ![](docs/showcase/faceted_rotate.gif) | [slices](docs/showcase/faceted_slices.gif) · [reslice](docs/showcase/faceted_reslice.gif) · [shine](docs/showcase/faceted_shine.gif) |
+
+The stack with its truth, slice by slice (comp-like):
+
+![comp-like: image, truth, truth on image](docs/showcase/comp_like_slices.gif)
+
+Where the threshold rule misses pores (red: floor 1 slice down, orange 2–3, yellow 4–8; blue outlines: pores it found):
+
+![shine-through misses on comp-like](docs/showcase/comp_like_shine.gif)
+
+**Other material families** the generator has (`--family`). They are rendered in the calibrated optics but not validated against real stacks; their GIFs are in [`docs/showcase/families/`](docs/showcase/families/).
+
+| spinodal | clustered spheres | agglomerate | three-scale catalyst | fibre felt | sheet felt | compressed |
+|---|---|---|---|---|---|---|
+| ![](docs/showcase/families/spinodal_rotate.gif) | ![](docs/showcase/families/spheres_rotate.gif) | ![](docs/showcase/families/agglomerate_rotate.gif) | ![](docs/showcase/families/catalyst_rotate.gif) | ![](docs/showcase/families/fiber_felt_rotate.gif) | ![](docs/showcase/families/sheet_felt_rotate.gif) | ![](docs/showcase/families/compressed_rotate.gif) |
+
+## Look through a stack: the viewer
+
+![the viewer: milling and rotating a fibre mat](docs/media/viewer_demo.gif)
+
+`docs/viewer/index.html` is a single page with no install. Open it on [GitHub Pages](https://beetroottree.github.io/pfib-synth/viewer/), where all 14 stacks above are bundled, or open it locally and drop in a `.pfibv` file.
+
+* **3-D block**: drag to rotate, scroll to zoom. There are four views:
+  * the milled block, with the image on every face;
+  * the solid surface from the truth;
+  * the pore space;
+  * an x-ray view.
+* **Mill with slice**: the 3-D block is cut back to the current slice, as the beam does. **Corner cut** opens the block at the crosshair to show the inside. **z stretch** sets the slice thickness.
+* **Cut face**: play or step through slices (space, arrow keys). Overlays show pore outlines, tinted pores, truth only, or a swipe between image and truth. Click to move the crosshair.
+* **x–z and y–z cuts** through the crosshair, with depth running down. Click them to jump to a slice.
+* **Links**: `?mode=0..3&z=40&yaw=2.4&ov=tint#fibre_mat` opens a given stack and view.
+
+To pack your own stack: `python tools/export_viewer.py out/<name>` writes `out/<name>/<name>.pfibv`. Use `--bin 2` for a smaller file.
+
+## Make your own
+
 ```bash
 pip install -r requirements.txt
-python generate.py --list
-python generate.py comp_like --frames 40 --width 512     # ~1 min, writes out/comp_like/
-python generate.py fibre_mat                              # full 118-frame package, ~6 min
+python studio.py                                          # browser form: generate, then view (below)
+python generate.py --list                                 # presets, material families, render knobs
+python generate.py comp_like --frames 40 --width 512      # ~40 s, writes out/comp_like/
+python generate.py fibre_mat --view                       # full 118-slice package + viewer file + showcase GIFs
+python generate.py --style comp --family spinodal --porosity 0.5 --name my_spinodal
+python generate.py faceted --mat crystal_px=40 --set 'jitter=[0.3,0.2]' --set 'halo=[0.5,2]'
+python generate.py --config examples/thick_fibres.json    # everything in a file; out/<name>/job.json reruns a stack
 ```
 
-Each package matches the team's review packages: an image stack `synth_<material>_full.tif` and truth masks `truth/masks/slice_NNNN.png` (0 = pore, 255 = solid, 128 = outside the layer, the encoding `eponge.io.export_to_classes` reads). `start_masks/` holds what the threshold rule behind our labels would have drawn, and `truth.json` holds every setting and the true porosity. No real data is needed to generate. The calibrated constants (`optics_v5.json`, `geometry.json`, `slicing.json`, ...) were measured on the real stacks once. The one thing the generator used to read from them at run time, the layer's grey-level histogram, now ships as `pfibsynth/real_tone.json`. A stack generated from this repo is byte-identical to one from the original working copy (tested on a 10 × 630 × 320 comp stack with the real stacks hidden).
+**Studio.** `python studio.py` opens a local page (127.0.0.1 only). It has:
 
-## Materials
+* a form with every parameter: preset, microscope style, material family and its builder arguments, porosity, slices, width, seed, and every render knob, each shown with its calibrated value;
+* the equivalent command line for whatever you have set;
+* a live log while generating;
+* a card for each finished stack, with its five GIFs and a link that opens it in the viewer.
 
-Three are calibrated to our real stacks. Four are never used in training and test whether a model learned shine-through or just learned our three materials.
+![the studio](docs/media/studio.png)
 
-| | image · truth · truth on image |
-|---|---|
-| **comp-like**: Voronoi-foam catalyst, sparse large voids, calibrated to comp | ![](docs/media/comp_like.gif) |
-| **uncomp-like**: coarser open foam, calibrated to uncomp | ![](docs/media/uncomp_like.gif) |
-| **pristine-like**: finer foam, pristine's detector and contrast | ![](docs/media/pristine_like.gif) |
-| **mudcrack** (held out): a 3-D crack network through the layer | ![](docs/media/mudcrack.gif) |
-| **fibre mat** (held out): stacked fibres, rims brighter than cores | ![](docs/media/fibre_mat.gif) |
-| **coated fibre** (held out): fibres decorated with particles and binder | ![](docs/media/fibre_coated.gif) |
-| **faceted** (held out): sintered polycrystal, a grey level per grain, pores at junctions | ![](docs/media/faceted.gif) |
+Two settings do most of the work:
 
-![one frame of each material over its truth](docs/media/gallery.png)
+* **Microscope style** (`--style comp | uncomp | pristine`): which real acquisition the beam, depth response, detector and surroundings of the layer are calibrated to.
+* **Material family** (`--family`): how the 3-D material is built.
+
+Any pairing works. **Render knobs** (`--set`) override single calibrated settings: slice thickness `zlen`, beam-angle edge asymmetry `edge_dy`, edge blooming `halo`, stage `jitter`, curtaining, micropores, large voids, detector saturation and noise correlation. `generate.py --list` describes each, and `pfibsynth/slicing.json` holds the calibrated values with the reasons behind them.
+
+Each package matches the team's review packages:
+
+* `synth_<name>_full.tif`: the image stack.
+* `truth/masks/slice_NNNN.png`: the truth masks (0 = pore, 255 = solid, 128 = outside the layer, the encoding `eponge.io.export_to_classes` reads).
+* `start_masks/`: what the threshold rule behind our labels would have drawn.
+* `truth.json`: every setting and the true porosity.
+
+No real data is needed to generate. The calibrated constants (`optics_v5.json`, `geometry.json`, `slicing.json`, ...) were measured on the real stacks once. The one thing the generator used to read from them at run time, the layer's grey-level histogram, ships as `pfibsynth/real_tone.json`. A stack from this repo is byte-identical to one from the original working copy (tested with the real stacks hidden).
 
 ## How a stack is made
 
@@ -39,7 +108,7 @@ The generator mimics the process rather than the look. The look follows from the
 
 1. **One material, milled.** The material is a 3-D volume. Each frame is the face left after removing one slice, and a slice is thinner than a pixel: about 0.8–0.9 px of material per slice, fitted to how fast real structure decorrelates between frames. Coarse structure stretches further along the milling axis than fine structure, as in the real stacks. Cutting through an x–z plane gives one continuous object, not a stack of unrelated pictures:
 
-   ![x-z reslice of comp-like: image and truth](docs/media/reslice_comp_like.png)
+   ![x-z cut sweeping through comp-like: image and truth](docs/showcase/comp_like_reslice.gif)
 
 2. **The beam comes in at 52°.** For every pore pixel, the renderer traces down the beam into the volume until it hits solid. The brightness falls off with that depth (fitted shine-through curve), with the secant of the wall, and with edge escape. Edge escape is directional: a pore's top edge overhangs and blooms, its bottom edge does not, so the top/bottom contrast matches real frames (1.22 vs 1.24 on comp). The frame drifts about 1.1 px per slice, and buried surfaces move a further 0.2–0.3 px per slice (parallax). In real stacks you can watch a pore's floor come forward from the back over several slices; here it is the same geometry.
 
@@ -103,20 +172,26 @@ Reproduce with `experiments/score_millnet.py` (needs the team repo at `eponge-v2
 ## Layout
 
 ```
-generate.py              presets for the seven materials -> pfibsynth/make_full.py
+generate.py              command line: presets, families, --set / --mat / --config, --view
+studio.py                local browser app: form -> generate -> viewer + GIFs
 pfibsynth/
   make_full.py           build + render a full stack, write the package
-  materials.py           foam, mudcrack, fibre, faceted material builders
-  context.py             layout outside the layer: support, cap, voids, caverns
+  materials.py           material builders (foam, mudcrack, fibre, faceted, spinodal, spheres, ...)
+  context.py             what is around the layer: support, cap, voids, caverns
   microscope.py, v4.py   beam / depth response / edge escape / detector
   make_package.py        package writer and the threshold-rule start masks
   slicing.json           per-acquisition slicing and realism settings, with the reasons
   optics_v5.json, geometry.json, real_tone.json, ...   calibrated constants
   scorecard.py, temporal_scorecard.py    realism discriminators (need real data)
   shine_data.py, train_shine.py, shine_depth_eval.py  training and evaluation
-experiments/             MillNet-SA2 on exact truth: driver, results, plot
-tools/                   README media; truth GIFs and coming-forward coherence next to a real stack
-docs/media/              everything shown above
+tools/
+  showcase.py            the five showcase GIFs for any package
+  export_viewer.py       pack a package into a .pfibv file for the viewer
+  demo_media.py          gallery.png, all_materials.gif, reslice PNG
+  passgif_t.py, forward.py   real-vs-synthetic GIFs and coming-forward coherence (need a real stack)
+docs/                    GitHub Pages: index.html (gallery), viewer/, studio/ (served by studio.py), showcase/, media/
+experiments/             MillNet-SA2 on exact truth: driver, real-frame control, results, plot
+examples/                config files and a porosity sweep
 ```
 
 | variable | what | needed for |

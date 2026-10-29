@@ -133,9 +133,8 @@ def main():
     A = real_patches(lo, args.n // len(lo) + 1)
     B = real_patches(hi, args.n // len(hi) + 1)
 
-    sp = Path(args.synth) if args.synth else (
-        Path("/private/tmp/claude-501/-Users-houkinwan-Desktop-Workspace-CMU-capstone"
-             "/01ca0e40-1416-4190-aea7-1125ccc06838/scratchpad") / f"syn_{args.style}")
+    from paths import OUT
+    sp = Path(args.synth) if args.synth else OUT / f"syn_{args.style}"
     meta = json.loads((sp / "stack.json").read_text())
     S = []
     nsl = len(list((sp / "truth" / "masks").glob("*.png")))
