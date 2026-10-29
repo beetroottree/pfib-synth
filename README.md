@@ -4,7 +4,7 @@
 
 **[Open the 3-D viewer in your browser](https://beetroottree.github.io/pfib-synth/viewer/)** · [showcase gallery](https://beetroottree.github.io/pfib-synth/) · [make your own](#make-your-own)
 
-![seven materials in 3-D, from the exact truth](docs/media/rotate_grid.gif)
+![the viewer: milling and rotating a fibre mat](docs/media/viewer_demo.gif)
 
 In a pFIB-SEM stack, the beam images the cut face at 52°, so a pore does not look black: you see its lit floor or far wall a few slices down. This is *shine-through*. A pore whose floor is one slice down looks almost like solid. Hand labels and threshold rules call it solid, and every model trained on those labels learns to do the same. On real data nobody can measure how often this happens, because nobody knows the answer.
 
@@ -40,6 +40,8 @@ Where the threshold rule misses pores (red: floor 1 slice down, orange 2–3, ye
 
 ![shine-through misses on comp-like](docs/showcase/comp_like_shine.gif)
 
+![all seven materials, paged slice by slice](docs/media/all_materials.gif)
+
 **Other material families** the generator has (`--family`). They are rendered in the calibrated optics but not validated against real stacks; their GIFs are in [`docs/showcase/families/`](docs/showcase/families/).
 
 | spinodal | clustered spheres | agglomerate | three-scale catalyst | fibre felt | sheet felt | compressed |
@@ -47,8 +49,6 @@ Where the threshold rule misses pores (red: floor 1 slice down, orange 2–3, ye
 | ![](docs/showcase/families/spinodal_rotate.gif) | ![](docs/showcase/families/spheres_rotate.gif) | ![](docs/showcase/families/agglomerate_rotate.gif) | ![](docs/showcase/families/catalyst_rotate.gif) | ![](docs/showcase/families/fiber_felt_rotate.gif) | ![](docs/showcase/families/sheet_felt_rotate.gif) | ![](docs/showcase/families/compressed_rotate.gif) |
 
 ## Look through a stack: the viewer
-
-![the viewer: milling and rotating a fibre mat](docs/media/viewer_demo.gif)
 
 `docs/viewer/index.html` is a single page with no install. Open it on [GitHub Pages](https://beetroottree.github.io/pfib-synth/viewer/), where all 14 stacks above are bundled, or open it locally and drop in a `.pfibv` file.
 
@@ -157,7 +157,7 @@ On the synthetic stacks themselves, MillNet behaves like the rule: it misses the
 Two caveats limit how far this goes:
 
 * **Matched renderer.** The synthetic U-Nets were trained on this renderer and MillNet was not, so part of their lead is a matched-renderer advantage. The same effect showed up as 2.9 vs 15.6 pp in the earlier cross-renderer test.
-* **Synthetic is still distinguishable from real** (table above). This is the same domain shift.
+* **Synthetic is still distinguishable from real** (table above). This is the same domain shift. Part of it is specific to MillNet: it conditions on whole-frame grey-level statistics (FiLM), and here it saw whole synthetic frames, not synthetic crops pasted into a real frame (the team's `twin_context_check.py` approach). That likely explains part of the drop in agreement from 0.94 to 0.76.
 
 The rule's layer IoU is 1.0 only because start masks take the layer outline from the truth.
 

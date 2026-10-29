@@ -163,7 +163,7 @@ async function packages() {
   }).join("");
   document.querySelectorAll(".gl button").forEach(b => b.onclick = () => { $("im" + b.dataset.i).src = b.dataset.g; });
 }
-init();
+init().catch(() => { document.querySelector("main").innerHTML = '<section class="card" style="grid-column:1/-1"><h2>Studio needs its local server</h2><p>This page generates stacks on your machine. Run <code>python studio.py</code> in a clone of the repo; it opens here at http://127.0.0.1:8770. To look at stacks without installing anything, use the <a href="../viewer/">viewer</a>.</p></section>'; });
 </script>
 </body>
 </html>
