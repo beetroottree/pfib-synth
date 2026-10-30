@@ -10,13 +10,22 @@
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 60px}
 h1{font-size:28px;margin:0 0 6px}
-h2{font-size:18px;margin:36px 0 10px}
-p{color:#c9ced4;max-width:70ch}
+h2{font-size:20px;margin:40px 0 10px}
+p{color:#c9ced4;max-width:72ch}
 a{color:var(--acc)}
 .cta{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
 .cta a{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 14px;text-decoration:none;color:var(--fg)}
 .cta a.main{background:var(--acc);color:#081018;border:0;font-weight:600}
-.hero{width:100%;border-radius:10px;border:1px solid var(--line)}
+.stage{background:#000;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stage img{width:100%;display:block}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.bar .sep{flex:1}
+.bar button{background:var(--panel);color:var(--dim);border:1px solid var(--line);border-radius:6px;font:13px inherit;padding:5px 10px;cursor:pointer}
+.bar button.on{color:#081018;background:var(--acc);border-color:var(--acc)}
+.cap{color:var(--dim);font-size:14px;margin:8px 2px 0;max-width:none}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px}
+.read div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;color:#c9ced4;min-width:0}
+.read b{color:var(--fg);display:block;margin-bottom:2px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .m{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
 .m h3{margin:0 0 6px;font-size:14px;display:flex;justify-content:space-between;gap:8px}
@@ -31,24 +40,64 @@ code{background:#0b0c0f;border:1px solid var(--line);border-radius:4px;padding:1
 <body>
 <div class="wrap">
   <h1>pfib-synth</h1>
-  <p>Synthetic pFIB-SEM stacks of porous catalyst layers, with exact ground truth for every pixel. The generator builds a 3-D material, mills it one slice at a time, and renders each cut face the way the 52° electron beam sees it, calibrated to three real acquisitions.</p>
+  <p>A plasma focused-ion-beam microscope (pFIB-SEM) images a material by destroying it carefully: an ion beam shaves off a slice thinner than a pixel, an electron beam photographs the fresh face, and this repeats hundreds of times. Stacking the photographs gives a 3-D image of the material. In the real data nobody knows which pixels are truly pore and which are solid, because the electron beam also sees down into open pores. Here the material is built first, so every pixel of every slice has an exact answer.</p>
   <div class="cta">
     <a class="main" href="viewer/">Open the 3-D viewer</a>
     <a href="https://github.com/beetroottree/pfib-synth">Code on GitHub</a>
     <a href="https://github.com/beetroottree/pfib-synth#make-your-own">Generate your own</a>
   </div>
-  <img class="hero" src="media/viewer_demo.gif" alt="the viewer: milling and rotating a fibre mat">
-  <h2>Seven validated materials</h2>
-  <p>Each one: the block being milled, the solid in 3-D, the stack slice by slice with its truth, an x-z cut sweeping through, and where a threshold rule misses pores whose lit floor shows through.</p>
+
+  <h2>A full synthetic acquisition, as the microscope records it</h2>
+  <p>The whole frame, slice after slice, at the size and layout of our real acquisitions. Nothing is cropped or straightened: the picture drifts as the cut advances, just as the real stacks do. Pick a material, and switch on the exact answer underneath.</p>
+  <div class="bar" id="pick"></div>
+  <div class="bar" id="view">
+    <button data-v="frame" class="on">Microscope image</button>
+    <button data-v="frame_truth">Image + exact truth</button>
+    <span class="sep"></span>
+    <a id="still" href="#">full-resolution still</a>
+  </div>
+  <div class="stage"><img id="full" alt="full synthetic frame, slice by slice"></div>
+  <p class="cap" id="about"></p>
+  <div class="read">
+    <div><b>Cap (top)</b>A protective layer deposited before milling. Smooth, featureless, and not scored.</div>
+    <div><b>Porous layer (middle)</b>The material being measured. Bright is solid; dark is pore. Grey inside a pore is the wall or floor below the cut, seen through the opening.</div>
+    <div><b>Support (bottom)</b>The substrate the layer sits on, with its own large cavities. Not scored.</div>
+    <div><b>Exact truth</b>Black pore, white solid, grey outside the layer. It comes from the 3-D model, not from anyone drawing it.</div>
+  </div>
+
+  <h2>Close-ups: inside the block</h2>
+  <p>A 224-pixel window inside each layer, with the drift taken out so the same material stays in view. <b>milling</b> shows the block being cut; <b>rotate</b> is the solid in 3-D; <b>slices</b> pairs the image with its truth; <b>reslice</b> sweeps a side-on cut through the block; <b>shine</b> marks pores a simple threshold misses because their lit floor shows through.</p>
   <div class="grid" id="mats"></div>
   <h2>More material families</h2>
-  <p>Builders the generator also has (<code>--family</code>), rendered in the calibrated optics. Not validated against real stacks.</p>
+  <p>Further builders the generator has (<code>--family</code>), shown in the same calibrated microscope. These have not been compared against real stacks.</p>
   <div class="grid" id="fams"></div>
 </div>
 <script>
 const MATS = [["comp_like","comp-like"],["uncomp_like","uncomp-like"],["pristine_like","pristine-like"],["mudcrack","mudcrack"],["fibre_mat","fibre mat"],["fibre_coated","coated fibre"],["faceted","faceted grains"]];
+const ABOUT = {
+  comp_like: "Catalyst-layer foam with a few large voids, in the microscope settings measured on the real compressed sample. 1860 × 630 px per frame.",
+  uncomp_like: "Coarser, more open foam, in the settings measured on the real uncompressed sample. 1642 × 689 px.",
+  pristine_like: "Finer foam in the pristine sample's settings, including its black no-data band at the top and the trench walls at the sides. 1995 × 1100 px; this sample barely drifts.",
+  mudcrack: "A porous layer split by a 3-D network of drying cracks. Not one of the calibrated materials: a test of whether models generalise.",
+  fibre_mat: "Stacked fibres lying in the layer plane, with bright rims. Not one of the calibrated materials.",
+  fibre_coated: "Fibres coated with particles and binder. Not one of the calibrated materials.",
+  faceted: "Sintered grains with pores at the junctions, in the pristine settings. Not one of the calibrated materials."
+};
 const FAMS = [["spinodal","spinodal"],["spheres","clustered spheres"],["agglomerate","agglomerate"],["catalyst","three-scale catalyst"],["fiber_felt","fibre felt"],["sheet_felt","sheet felt"],["compressed","compressed"]];
 const KINDS = ["milling","rotate","slices","reslice","shine"];
+let cur = "comp_like", kind = "frame";
+function show() {
+  document.getElementById("full").src = `showcase/full/${cur}_${kind}.gif`;
+  document.getElementById("still").href = `showcase/full/${cur}_frame.png`;
+  document.getElementById("about").textContent = "Synthetic. " + ABOUT[cur] + " Every second slice of 118 is shown.";
+  document.querySelectorAll("#pick button").forEach(b => b.classList.toggle("on", b.dataset.k === cur));
+  document.querySelectorAll("#view button").forEach(b => b.classList.toggle("on", b.dataset.v === kind));
+}
+document.getElementById("pick").innerHTML = MATS.map(([k, l]) => `<button data-k="${k}">${l}</button>`).join("");
+document.querySelectorAll("#pick button").forEach(b => b.onclick = () => { cur = b.dataset.k; show(); });
+document.querySelectorAll("#view button").forEach(b => b.onclick = () => { kind = b.dataset.v; show(); });
+if (MATS.some(([k]) => k === location.hash.slice(1))) cur = location.hash.slice(1);
+show();
 function card(dir, key, label, viewer) {
   return `<div class="m"><h3>${label}<a href="viewer/#${viewer}">open in viewer</a></h3><img id="i_${key}" src="${dir}${key}_milling.gif" alt="${label}" loading="lazy">
   <div class="tabs">${KINDS.map((k, i) => `<button class="${i ? "" : "on"}" data-k="${key}" data-d="${dir}" data-v="${k}">${k}</button>`).join("")}</div></div>`;

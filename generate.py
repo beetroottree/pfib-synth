@@ -133,7 +133,7 @@ def main():
     ap.add_argument("--out", default=None, help="output folder (default out/<name>)")
     ap.add_argument("--mat", action="append", metavar="KEY=VALUE", help="material builder argument, repeatable")
     ap.add_argument("--set", action="append", metavar="KEY=VALUE", help="render setting override, repeatable (see --list)")
-    ap.add_argument("--view", action="store_true", help="afterwards: pack for the viewer and render the showcase GIFs")
+    ap.add_argument("--view", action="store_true", help="afterwards: pack for the viewer and render the showcase and full-frame GIFs")
     ap.add_argument("--dry-run", action="store_true", help="print the resolved job and command only")
     a = ap.parse_args()
     if a.list or not (a.material or a.config or a.style):
@@ -158,6 +158,7 @@ def main():
     if rc == 0 and a.view:
         rc = subprocess.call([sys.executable, str(HERE / "tools" / "export_viewer.py"), job["out"]])
         rc = rc or subprocess.call([sys.executable, str(HERE / "tools" / "showcase.py"), job["out"], str(Path(job["out"]) / "gifs"), "--label", job["name"]])
+        rc = rc or subprocess.call([sys.executable, str(HERE / "tools" / "fullframe.py"), job["out"], str(Path(job["out"]) / "gifs"), "--label", job["name"]])
     sys.exit(rc)
 
 

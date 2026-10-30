@@ -12,7 +12,29 @@ This generator builds a 3-D material, mills it slice by slice the way the micros
 
 ## Showcase
 
-Each material has five GIFs:
+### A full synthetic acquisition
+
+This is the whole frame, slice after slice, at the size and layout of a real acquisition. The protective cap is on top, the porous layer that gets scored is in the middle, and the support is below. Nothing is cropped or straightened: the picture drifts as the cut advances, as the real stacks do. Below it is the same frame with its exact truth (black pore, white solid, grey outside the layer).
+
+![comp-like: the full frame as the microscope records it, slice by slice](docs/showcase/full/comp_like_frame.gif)
+
+![comp-like: full frame above its exact truth](docs/showcase/full/comp_like_frame_truth.gif)
+
+| material | full frame | with truth | still |
+|---|---|---|---|
+| comp-like (1860 × 630) | [gif](docs/showcase/full/comp_like_frame.gif) | [gif](docs/showcase/full/comp_like_frame_truth.gif) | [png](docs/showcase/full/comp_like_frame.png) |
+| uncomp-like (1642 × 689) | [gif](docs/showcase/full/uncomp_like_frame.gif) | [gif](docs/showcase/full/uncomp_like_frame_truth.gif) | [png](docs/showcase/full/uncomp_like_frame.png) |
+| pristine-like (1995 × 1100) | [gif](docs/showcase/full/pristine_like_frame.gif) | [gif](docs/showcase/full/pristine_like_frame_truth.gif) | [png](docs/showcase/full/pristine_like_frame.png) |
+| mudcrack | [gif](docs/showcase/full/mudcrack_frame.gif) | [gif](docs/showcase/full/mudcrack_frame_truth.gif) | [png](docs/showcase/full/mudcrack_frame.png) |
+| fibre mat | [gif](docs/showcase/full/fibre_mat_frame.gif) | [gif](docs/showcase/full/fibre_mat_frame_truth.gif) | [png](docs/showcase/full/fibre_mat_frame.png) |
+| coated fibre | [gif](docs/showcase/full/fibre_coated_frame.gif) | [gif](docs/showcase/full/fibre_coated_frame_truth.gif) | [png](docs/showcase/full/fibre_coated_frame.png) |
+| faceted | [gif](docs/showcase/full/faceted_frame.gif) | [gif](docs/showcase/full/faceted_frame_truth.gif) | [png](docs/showcase/full/faceted_frame.png) |
+
+The same, with a material picker, is on the [project page](https://beetroottree.github.io/pfib-synth/). Make these for your own stack with `python tools/fullframe.py out/<name> out/<name>/gifs`.
+
+### Close-ups
+
+The GIFs below zoom into a 224 px window inside the layer, with the drift removed so the same material stays in view. Each material has five:
 
 * **milling**: the ion beam takes one slice at a time. The front of the block is the frame the electron beam images.
 * **rotate**: the solid phase in 3-D, built from the exact truth with the frame drift removed.
@@ -196,7 +218,8 @@ pfibsynth/
   scorecard.py, temporal_scorecard.py    realism discriminators (need real data)
   shine_data.py, train_shine.py, shine_depth_eval.py  training and evaluation
 tools/
-  showcase.py            the five showcase GIFs for any package
+  showcase.py            the five close-up showcase GIFs for any package
+  fullframe.py           full-frame GIFs (the whole sheet, as recorded) and a still
   export_viewer.py       pack a package into a .pfibv file for the viewer
   demo_media.py          gallery.png, all_materials.gif, reslice PNG
   passgif_t.py, forward.py   real-vs-synthetic GIFs and coming-forward coherence (need a real stack)
